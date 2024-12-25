@@ -34,6 +34,14 @@ public class TopDownCharacterController : MonoBehaviour
     /// When the script first initialises this gets called.
     /// Use this for grabbing components and setting up input bindings.
     /// </summary>
+    [Header("Projectile parameters")]
+    //Reference to the game obj
+    [SerializeField] GameObject m_projectilePrefab;
+    //Wgere the projectile will be spawned from
+    [SerializeField] Transform m_firePoint;
+    //How fast our projectile will travel
+    [SerializeField] float m_projectileSpeed;
+
     private void Awake()
     {
         //bind movement inputs to variables
@@ -93,6 +101,18 @@ public class TopDownCharacterController : MonoBehaviour
             // just log that an attack has been registered for now
             // we will look at how to do this in future sessions.
             Debug.Log("Attack!");
+
+            Fire();
+        }
+    }
+    void Fire()//spawns a bullet from the location of the firepoint at the rotation of identity (null)
+    {
+        GameObject projectileToSpawn = Instantiate(m_projectilePrefab, m_firePoint.position, Quaternion.identity);
+        if (projectileToSpawn.GetComponent<Rigidbody2D>() != null)
+        {
+            projectileToSpawn.GetComponent<Rigidbody2D>().AddForce(Vector2.up * m_projectileSpeed, ForceMode2D.Impulse); //adds force to the object's y axis in relation to its speed
+            //the forcemode2d, type impulse is instantaneous as oppose to type force which is continuous
+            //a gun would apply force once to a bullet so impulse seems more relevant on this occasion
         }
     }
 }
