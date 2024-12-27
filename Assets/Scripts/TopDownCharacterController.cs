@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -41,7 +42,11 @@ public class TopDownCharacterController : MonoBehaviour
     [SerializeField] Transform m_firePoint;
     //How fast our projectile will travel
     [SerializeField] float m_projectileSpeed;
+    //How fast the projectiles will fire
+    [SerializeField] float m_fireRate;
 
+    private float m_fireTimeout = 0;
+    private Vector2 m_LastDirection;
     private void Awake()
     {
         //bind movement inputs to variables
@@ -93,24 +98,72 @@ public class TopDownCharacterController : MonoBehaviour
         {
             m_animator.SetFloat("Horizontal", m_playerDirection.x);
             m_animator.SetFloat("Vertical", m_playerDirection.y);
+
+            m_LastDirection = m_playerDirection;//Sets the last facing direction of the player
         }
 
         // check if an attack has been triggered.
-        if (m_attackAction.IsPressed())
+        if (m_attackAction.IsPressed() && Time.time > m_fireTimeout)//gives the bullets a delay between firing
         {
             // just log that an attack has been registered for now
             // we will look at how to do this in future sessions.
             Debug.Log("Attack!");
 
+            m_fireTimeout = Time.time + m_fireRate;//adding the fire rate increases fire timeout more and more this which means the if statement has to wait for the delay
+            //Debug.Log(Time.time);//increasing it forever is okay because it is being compared to time wich also always increases
             Fire();
         }
     }
     void Fire()//spawns a bullet from the location of the firepoint at the rotation of identity (null)
     {
-        GameObject projectileToSpawn = Instantiate(m_projectilePrefab, m_firePoint.position, Quaternion.identity);
+        // Vector3 mousePointOnScreen = Camera.main.ScreenToWorldPoint(mousePos);
+        Vector2 fireDirection = m_LastDirection;
+        Quaternion bulletRotation = Quaternion.identity;
+
+        //left right and idle directions
+        if (fireDirection == Vector2.zero)
+        {
+            fireDirection = Vector2.down;
+        }
+        else if (fireDirection == Vector2.left)
+        {
+            bulletRotation = Quaternion.Euler(0, 0, 90f);//if the direction faced is left rotate the bullet 90 degrees left
+        }
+        else if (fireDirection == Vector2.right)
+        {
+            bulletRotation = Quaternion.Euler(0, 0, 270f);//the same for facing right but in reverse
+        }
+
+        //NE SE SW NW diagonal directions
+        // Handle quadrant-based rotations
+        if (fireDirection == new Vector2(-0.71f, 0.71f))//NW
+        {
+            // Up-Left: 135 degrees
+            bulletRotation = Quaternion.Euler(0, 0, 135f);
+            Debug.Log("UP Left");
+        }
+        else if (fireDirection == new Vector2(0.71f, 0.71f))//NE
+        {
+            // Up-Right: 45 degrees
+            bulletRotation = Quaternion.Euler(0, 0, 45f);
+        }
+        else if (fireDirection == new Vector2(-0.71f, -0.71f))//SW
+        {
+            // Down-Left: 225 degrees
+            bulletRotation = Quaternion.Euler(0, 0, 225f);
+        }
+        else if (fireDirection == new Vector2(0.71f, -0.71f))//SE
+        {
+            // Down-Right: 315 degrees (or 0 to 45 for covering the full circle)
+            bulletRotation = Quaternion.Euler(0, 0, 315f);
+        }
+        Debug.Log(fireDirection);
+        Debug.Log((Vector2.left / 2) - new Vector2(0.21f,0.21f));
+
+        GameObject projectileToSpawn = Instantiate(m_projectilePrefab, m_firePoint.position, bulletRotation);//spawns a projectile using the prefab-object, firepoint and bullet rotation variables
         if (projectileToSpawn.GetComponent<Rigidbody2D>() != null)
         {
-            projectileToSpawn.GetComponent<Rigidbody2D>().AddForce(Vector2.up * m_projectileSpeed, ForceMode2D.Impulse); //adds force to the object's y axis in relation to its speed
+            projectileToSpawn.GetComponent<Rigidbody2D>().AddForce(fireDirection.normalized * m_projectileSpeed, ForceMode2D.Impulse); //adds force to the object's y axis in relation to its speed
             //the forcemode2d, type impulse is instantaneous as oppose to type force which is continuous
             //a gun would apply force once to a bullet so impulse seems more relevant on this occasion
         }
