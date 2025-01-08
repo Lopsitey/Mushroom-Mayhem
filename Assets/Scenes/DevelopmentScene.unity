@@ -284,8 +284,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 975d6d8e0c7b93d4f8c8dad16e11e45a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_scoreSystem: {fileID: 437098477}
-  m_UILabel: {fileID: 2142316264}
 --- !u!114 &437098477
 MonoBehaviour:
   m_ObjectHideFlags: 0
