@@ -14,6 +14,7 @@ public class TopDownCharacterController : MonoBehaviour
     //The inputs that we need to retrieve from the input system.
     private InputAction m_moveAction;
     private InputAction m_attackAction;
+    private InputAction m_rollAction;
 
     //The components that we need to edit to make the player move smoothly.
     private Animator m_animator;
@@ -44,7 +45,10 @@ public class TopDownCharacterController : MonoBehaviour
     [SerializeField] float m_projectileSpeed;
     //How fast the projectiles will fire
     [SerializeField] float m_fireRate;
+    //How fast you can roll - a method of indirectly accessing the rollTimeout variable
+    [SerializeField] float m_rollRate;
 
+    private float m_rollTimeout = 0;
     private float m_fireTimeout = 0;
     private Vector2 m_LastDirection;
     private void Awake()
@@ -52,7 +56,8 @@ public class TopDownCharacterController : MonoBehaviour
         //bind movement inputs to variables
         m_moveAction = InputSystem.actions.FindAction("Move");
         m_attackAction = InputSystem.actions.FindAction("Attack");
-        
+        m_rollAction = InputSystem.actions.FindAction("Jump");
+
         //get components from Character game object so that we can use them later.
         m_animator = GetComponent<Animator>();
         m_rigidbody = GetComponent<Rigidbody2D>();
@@ -110,8 +115,16 @@ public class TopDownCharacterController : MonoBehaviour
             Debug.Log("Attack!");
 
             m_fireTimeout = Time.time + m_fireRate;//adding the fire rate increases fire timeout more and more this which means the if statement has to wait for the delay
-            //Debug.Log(Time.time);//increasing it forever is okay because it is being compared to time wich also always increases
+            //Debug.Log(Time.time);//increasing it forever is okay because it is being compared to time which also always increases
             Fire();
+        }
+
+        if (m_rollAction.IsPressed() && Time.time > m_rollTimeout)
+        {
+            m_animator.SetTrigger("Rolling");
+            m_rollTimeout = Time.time + m_rollRate;
+            //Time.time + m_rollRate essentially just saying if the current time is equal to the time 2 seconds into the future
+            //saved to the fireRate variable so it isn't constantly increasing
         }
     }
     void Fire()//spawns a bullet from the location of the firepoint at the rotation of identity (null)
