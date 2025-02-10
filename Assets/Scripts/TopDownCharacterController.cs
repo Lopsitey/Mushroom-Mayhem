@@ -48,9 +48,14 @@ public class TopDownCharacterController : MonoBehaviour
     //How fast you can roll - a method of indirectly accessing the rollTimeout variable
     [SerializeField] float m_rollRate;
 
+    [Header("Lighting Parameters")]
+    [SerializeField] private Transform m_torchLight;
+    [SerializeField] private float m_rotationSpeed;
+
     private float m_rollTimeout = 0;
     private float m_fireTimeout = 0;
     private Vector2 m_LastDirection;
+    private Quaternion m_targetRotation;
     private void Awake()
     {
         //bind movement inputs to variables
@@ -126,7 +131,18 @@ public class TopDownCharacterController : MonoBehaviour
             //Time.time + m_rollRate essentially just saying if the current time is equal to the time 2 seconds into the future
             //saved to the fireRate variable so it isn't constantly increasing
         }
-    }
+
+        if (m_playerDirection != m_LastDirection) 
+        {
+            //Converts the x and y of m_playerDirection to polar coordinates, i.e. an angle
+            float angle = Mathf.Atan2(m_playerDirection.y, m_playerDirection.x) * Mathf.Rad2Deg;
+            m_targetRotation = Quaternion.Euler(0, 0, angle - 90);
+            //Sets the rotation to this angle on Z
+            m_LastDirection = m_playerDirection;
+            //m_torchLight.rotation = Quaternion.Euler(0, 0, angle - 90);
+            m_torchLight.rotation = Quaternion.RotateTowards(m_torchLight.rotation, m_targetRotation, m_rotationSpeed * Time.deltaTime);
+        }
+}
     void Fire()//spawns a bullet from the location of the firepoint at the rotation of identity (null)
     {
         // Vector3 mousePointOnScreen = Camera.main.ScreenToWorldPoint(mousePos);
