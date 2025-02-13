@@ -5,11 +5,12 @@ TagManager:
   serializedVersion: 3
   tags:
   - MovingObstacleWaypoint
+  - Enemy
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Bullet
   - Water
   - UI
   - 
@@ -41,6 +42,12 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Inner
+    uniqueID: 1536348001
+    locked: 0
+  - name: Core
+    uniqueID: 949220493
     locked: 0
   m_RenderingLayers:
   - Default

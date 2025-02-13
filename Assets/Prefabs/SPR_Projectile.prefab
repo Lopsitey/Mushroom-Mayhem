@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7486627259110322231}
   - component: {fileID: 4835142941728086894}
   - component: {fileID: -5911549608268121281}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: SPR_Projectile
   m_TagString: Player
   m_Icon: {fileID: 0}
