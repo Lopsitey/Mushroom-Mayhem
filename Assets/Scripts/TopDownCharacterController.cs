@@ -20,7 +20,7 @@ public class TopDownCharacterController : MonoBehaviour
 
     //The components that we need to edit to make the player move smoothly.
     private Animator m_animator;
-    private Rigidbody2D m_rigidbody;
+    private Rigidbody2D m_rigidBody;
     
     //The direction that the player is moving in.
     private Vector2 m_playerDirection;
@@ -31,12 +31,12 @@ public class TopDownCharacterController : MonoBehaviour
     //The maximum speed the player can move
     [SerializeField] private float m_playerMaxSpeed = 1000f;
     //How fast you can roll - a method of indirectly accessing the rollTimeout variable
-    [SerializeField] float m_rollRate;
+    [SerializeField] float m_rollRate = 1f;
 
     #endregion
 
     /// <summary>
-    /// When the script first initialises this gets called.
+    /// When the script first initializes this gets called.
     /// Use this for grabbing components and setting up input bindings.
     /// </summary>
     [Header("Projectile Parameters")]
@@ -53,7 +53,6 @@ public class TopDownCharacterController : MonoBehaviour
     [SerializeField] private Transform m_torchLight;
     [SerializeField] private float m_rotationSpeed;
 
-    private float m_rollTimeout = 0;
     private float m_fireTimeout = 0;
     private Vector2 m_LastDirection;
     private Quaternion m_targetRotation;
@@ -71,7 +70,6 @@ public class TopDownCharacterController : MonoBehaviour
     [SerializeField] private float m_maskMaxSize = 0.3f;
     [SerializeField] private int m_maskStabCount = 3;
 
-
     private void Awake()
     {
         //bind movement inputs to variables
@@ -82,7 +80,7 @@ public class TopDownCharacterController : MonoBehaviour
 
         //get components from Character game object so that we can use them later.
         m_animator = GetComponent<Animator>();
-        m_rigidbody = GetComponent<Rigidbody2D>();
+        m_rigidBody = GetComponent<Rigidbody2D>();
     }
 
     /// <summary>
@@ -109,7 +107,7 @@ public class TopDownCharacterController : MonoBehaviour
             speed = 0.0f;
         }
         //apply the movement to the character using the clamped speed value.
-        m_rigidbody.linearVelocity = m_playerDirection * (speed * Time.fixedDeltaTime);
+        m_rigidBody.linearVelocity = m_playerDirection * (speed * Time.fixedDeltaTime);
     }
     
     /// <summary>
@@ -119,7 +117,7 @@ public class TopDownCharacterController : MonoBehaviour
     /// </summary>
     void Update()
     {
-        // store any movement inputs into m_playerDirection - this will be used in FixedUpdate to move the player.
+        //Store any movement inputs into m_playerDirection - this will be used in FixedUpdate to move the player.
         if (m_lookAction.IsPressed())
         {
             Vector3 m_mousePosition = Input.mousePosition;//The mouse position
@@ -151,33 +149,38 @@ public class TopDownCharacterController : MonoBehaviour
             //Sets the rotation to this angle on Z and doesn't update the angle unless there is a new valid input
             m_targetRotation = m_playerDirection.magnitude < 0.01f ? m_targetRotation : Quaternion.Euler(0, 0, angle - 90);
         }
-            //smoothly rotates the light using the player's orientation
-            m_torchLight.rotation = Quaternion.Slerp(m_torchLight.rotation, m_targetRotation, m_rotationSpeed * Time.deltaTime);
+        //smoothly rotates the light using the player's orientation
+        m_torchLight.rotation = Quaternion.Slerp(m_torchLight.rotation, m_targetRotation, m_rotationSpeed * Time.deltaTime);
 
         // check if an attack has been triggered.
         if (m_attackAction.IsPressed() && Time.time > m_fireTimeout)//gives the bullets a delay between firing
         {
-            m_fireTimeout = Time.time + m_fireRate;//adding the fire rate increases fire timeout more and more this which means the if statement has to wait for the delay
+            m_fireTimeout = Time.time + m_fireRate;
+            //adding the fire rate increases fire timeout more and more this which means the if statement has to wait for the delay
             //increasing m_fireTimeout forever is okay because it is being compared to time which also always increases
             Fire();
-            TakeDamage();
         }
-        if (m_rollAction.IsPressed() && Time.time > m_rollTimeout && !m_isRolling)
+        if (m_rollAction.IsPressed() && !m_isRolling)//Ensures multiple rolls can't be instigated simultaneously
         {
-            m_isRolling = true; // Set rolling state
-            m_playerSpeed = m_playerSpeed * 2;
+            //Set rolling state
+            m_isRolling = true;
+
+            //Store the speed
+            float oldSpeed = m_playerSpeed;
+            float newSpeed = m_playerSpeed * 2;
+
+            //Set the speed and animation
+            m_playerSpeed = newSpeed;
             m_animator.SetTrigger("Rolling");
-            m_rollTimeout = Time.time + m_rollRate; // Set cooldown timer
-            //Time.time + m_rollRate essentially just saying if the current time is equal to the time 2 seconds into the future
-            //saved to the fireRate variable so it isn't constantly increasing
-            // Reset after roll duration
-            //StartCoroutine(EndRoll(m_rollRate));
+            
+            //Reset after roll duration
+            StartCoroutine(EndRoll(oldSpeed));
         }
     }
 
-    void Fire()//spawns a bullet from the location of the firepoint at the rotation of identity (null)
+    void Fire()//spawns a bullet from the location of the fire point at the rotation of identity (null)
     {
-        GameObject projectileToSpawn = Instantiate(m_projectilePrefab, m_firePoint.position, m_targetRotation);//spawns a projectile using the prefab-object, firepoint and target rotation variables
+        GameObject projectileToSpawn = Instantiate(m_projectilePrefab, m_firePoint.position, m_targetRotation);//spawns a projectile using the prefab-object, fire point and target rotation variables
         if (projectileToSpawn.GetComponent<Rigidbody2D>() != null)
         {
             projectileToSpawn.GetComponent<Rigidbody2D>().AddForce(m_LastDirection.normalized * m_projectileSpeed, ForceMode2D.Impulse);//adds force to the object's y axis in relation to its speed
@@ -186,13 +189,7 @@ public class TopDownCharacterController : MonoBehaviour
         }
     }
 
-    public void TakeDamage()
-    {
-        int i = 0;
-        StartCoroutine(ShowDamageMask(i));
-    }
-
-    private IEnumerator ShowDamageMask(int i)
+    public IEnumerator ShowDamageMask(int i)
     {
         m_maskCore.gameObject.SetActive(true);//Shows the mask
         m_maskOuter.gameObject.SetActive(true);
@@ -214,5 +211,17 @@ public class TopDownCharacterController : MonoBehaviour
         {
             StartCoroutine(ShowDamageMask(i));
         }
+    }
+
+    private IEnumerator EndRoll(float oldSpeed) 
+    {
+        yield return new WaitForSeconds(m_rollRate);
+        m_playerSpeed = oldSpeed;
+        m_isRolling = false;
+    }
+
+    public bool GetRolling()//Gets the state of roll for the enemy to decide if the attack will deal damage to the player
+    {
+        return m_isRolling;
     }
 }

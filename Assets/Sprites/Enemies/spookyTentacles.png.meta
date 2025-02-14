@@ -134,7 +134,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      spookyTentacles_0: -6019750515257072251
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
