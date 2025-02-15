@@ -1,5 +1,6 @@
 using UnityEngine;
 using static UnityEngine.Rendering.DebugUI;
+using UnityEngine.SceneManagement;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -26,6 +27,7 @@ public class PlayerHealth : MonoBehaviour
         if (m_currentHealth == 0)
         {
             //Player died!
+            SceneManager.LoadScene("RespawnMenu");
         }
 
         //Damage animation
