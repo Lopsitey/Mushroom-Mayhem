@@ -2,6 +2,7 @@ using UnityEngine;
 using static UnityEngine.Rendering.DebugUI;
 using UnityEngine.SceneManagement;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.UIElements;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -13,8 +14,12 @@ public class PlayerHealth : MonoBehaviour
     [Header("Miscellaneuos Parameters")]
     [SerializeField] private Light2D m_torch;
 
+    private ParticleSystem m_smokePuff;
+
     void Start()
     {
+        m_smokePuff = m_topDownCharacterController.gameObject.GetComponent<ParticleSystem>();
+        m_smokePuff.Stop();
         m_currentHealth = m_maxHealth;
     }
 
@@ -23,37 +28,44 @@ public class PlayerHealth : MonoBehaviour
         return m_currentHealth;
     }
 
-    public void TakeDamage(int amount)//Essentially a setter
+    public void TakeDamage(int amount, bool showMask)//Essentially a setter
     {
         m_currentHealth = Mathf.Clamp(m_currentHealth - amount, 0, m_maxHealth);
 
-        switch (m_currentHealth) 
+        if (m_currentHealth <= 70 && m_currentHealth >= 50)
         {
-            case 70:
-                m_torch.gameObject.SetActive(true);
-                break;
-            case 50:
-                m_torch.intensity = 4f;
-                m_torch.pointLightInnerAngle = 42;//Sets the inner cone angle
-                m_torch.pointLightOuterAngle = 70;//Sets the outer cone angle
-                break;
-            case 20:
-                m_torch.intensity = 6f;
-                m_torch.pointLightInnerAngle = 24;
-                m_torch.pointLightOuterAngle = 40;
-                break;
+            m_torch.gameObject.SetActive(true);
         }
-
-        //Handles player death if health reaches zero
-        if (m_currentHealth == 0)
+        if (m_currentHealth <= 50 && m_currentHealth > 20)
         {
+            m_torch.intensity = 4f;
+            m_torch.pointLightInnerAngle = 42;//Sets the inner cone angle
+            m_torch.pointLightOuterAngle = 70;//Sets the outer cone angle
+        }
+        else if (m_currentHealth <= 20 && m_currentHealth > 0)
+        {
+            m_torch.intensity = 6f;
+            m_torch.pointLightInnerAngle = 24;
+            m_torch.pointLightOuterAngle = 40;
+        }
+        else if (m_currentHealth == 0)
+        {
+            //Handles player death if health reaches zero
             //Player died!
             SceneManager.LoadScene("RespawnMenu");
         }
 
-        //Damage animation
-        int i = 0;
-        StartCoroutine(m_topDownCharacterController.ShowDamageMask(i));
+        if (showMask)
+        {
+            //Damage animation
+            int i = 0;
+            StartCoroutine(m_topDownCharacterController.ShowDamageMask(i));
+        }
+        else 
+        {
+            //Fire damage animation
+            m_smokePuff.Play();
+        }
     }
 
     public void Heal(int value)//Another setter

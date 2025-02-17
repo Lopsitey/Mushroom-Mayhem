@@ -1,35 +1,34 @@
+using System.Runtime.CompilerServices;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
 
 public class DamageDealer : MonoBehaviour
 {
-    [SerializeField] public int m_damageAmount = 10; // Adjust damage value as needed
+    [Header("Damage Parameters")]
+    [SerializeField] public int m_damageAmount = 50;//Default is 50 damage, half health per hit
+    [SerializeField] public float m_damageCooldownAmount = 2f;//Default is 2 seconds
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    private bool m_damaging = false;
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
         GameObject otherObj = collision.gameObject;
-        if (otherObj.CompareTag("Player"))
+        if (otherObj.CompareTag("Player") && !m_damaging)
         {
-            // Apply damage to the player
+            //Start damaging the player
+            m_damaging = true;
             PlayerHealth playerHealth = otherObj.GetComponent<PlayerHealth>();
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(m_damageAmount);
-                //Output that damage was taken
-                Debug.Log("Player took damage!");
-                Debug.Log("Player health is now: " + playerHealth.GetCurrentHealth());
+                playerHealth.TakeDamage(m_damageAmount, false);//Apply damage but son't show the mask
             }
+            StartCoroutine(DamageCooldown());
         }
+    }
+    private IEnumerator DamageCooldown()
+    {
+        yield return new WaitForSeconds(m_damageCooldownAmount);
+        m_damaging = false;
     }
 }

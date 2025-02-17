@@ -86,7 +86,7 @@ public class EnemyController : MonoBehaviour
             if (!m_playerHealth.GetTopDown().GetRolling())//If the player isn't rolling
             {
                 m_attacking = true;
-                m_playerHealth.TakeDamage(m_attackDamage);
+                m_playerHealth.TakeDamage(m_attackDamage, true);//Apply damage but do show the mask
                 StartCoroutine(AttackDelay());//Delay for next attack
             }
             else
