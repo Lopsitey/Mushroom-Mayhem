@@ -113,7 +113,7 @@ public class EnemyController : MonoBehaviour
 
     IEnumerator AttackDelay() 
     {
-        yield return new WaitForSeconds(m_attackSpeed);//Attacks once every second by default
+        yield return new WaitForSeconds(m_attackSpeed);//Attacks once every two seconds by default
         m_attacking = false;
         m_enemyStates = EnemyStates.MovingToPlayer;//Resume chasing after attacking
     }

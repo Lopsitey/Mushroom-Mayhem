@@ -54,7 +54,8 @@ public class TopDownCharacterController : MonoBehaviour
     [SerializeField] private float m_rotationSpeed;
 
     private float m_fireTimeout = 0;
-    private Vector2 m_LastDirection;
+    //Default to 0.0f, -1.0f which is facing down so if the player tries to fire a bullet without moving it will always have a valid direction
+    private Vector2 m_LastDirection = new Vector2(0.0f, -1.00f);
     private Quaternion m_targetRotation;
     private bool m_move;
     private bool m_isRolling;

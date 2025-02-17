@@ -48,7 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_scoreGiven: 1
   m_collectibleUI: {fileID: 0}
-  m_sunFlashTime: 0.25
+  m_sunFlashTime: 1
 --- !u!212 &172009503153751700
 SpriteRenderer:
   m_ObjectHideFlags: 0

@@ -25,4 +25,8 @@ public class PauseMenu : MonoBehaviour
     {
         m_pausePanel.SetActive(false);//closes the menu via back button press
     }
+    public void Quit()
+    {
+        Application.Quit();
+    }
 }

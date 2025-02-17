@@ -32,7 +32,7 @@ public class CollectibleBehavior : MonoBehaviour
             if (!m_flashCooldown)//If the flash isn't on cooldown
             {
                 m_flashCooldown = true;
-                m_sun.color = Color.white;//Toggles the sun white
+                m_sun.color = new Color(0.5f, 0.5f, 0.5f, 1f);//Toggles the sun grey ~ red 1f, 0.04f, 0.08f
                 StartCoroutine(LightFlash());//0.25 second delay before going black
             }
         }

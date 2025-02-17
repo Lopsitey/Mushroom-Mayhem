@@ -38,8 +38,10 @@ public class CollectibleUI : MonoBehaviour
         }
         if (m_winScoreLabel != null)
         {
+            double mins = Time.time > 60 ? Math.Truncate(Time.time / 60) : 0;
+            double secs = Math.Truncate(Time.time - (mins * 60));//May be off by one on occasion
             m_winUILabel = m_winScoreLabel.GetComponent<TMPro.TextMeshProUGUI>();
-            m_winUILabel.text = $"Your final time: {Math.Truncate(Time.time / 60)}:{Math.Truncate(Time.time)}";
+            m_winUILabel.text = $"Your final time: {mins}:{secs}";
         }
     }
 
@@ -64,8 +66,11 @@ public class CollectibleUI : MonoBehaviour
                 case 15:
                     m_enemyArray[2].SetActive(true);
                     break;
-                case 19:
+                case 17:
                     m_enemyArray[3].SetActive(true);
+                    break;
+                case 19:
+                    m_enemyArray[4].SetActive(true);
                     break;
             }
         }

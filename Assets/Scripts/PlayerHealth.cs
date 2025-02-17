@@ -1,6 +1,7 @@
 using UnityEngine;
 using static UnityEngine.Rendering.DebugUI;
 using UnityEngine.SceneManagement;
+using UnityEngine.Rendering.Universal;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -8,6 +9,9 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private int m_currentHealth = 100;
     [SerializeField] private int m_maxHealth = 100;
     [SerializeField] private TopDownCharacterController m_topDownCharacterController;
+
+    [Header("Miscellaneuos Parameters")]
+    [SerializeField] private Light2D m_torch;
 
     void Start()
     {
@@ -22,6 +26,23 @@ public class PlayerHealth : MonoBehaviour
     public void TakeDamage(int amount)//Essentially a setter
     {
         m_currentHealth = Mathf.Clamp(m_currentHealth - amount, 0, m_maxHealth);
+
+        switch (m_currentHealth) 
+        {
+            case 70:
+                m_torch.gameObject.SetActive(true);
+                break;
+            case 50:
+                m_torch.intensity = 4f;
+                m_torch.pointLightInnerAngle = 42;//Sets the inner cone angle
+                m_torch.pointLightOuterAngle = 70;//Sets the outer cone angle
+                break;
+            case 20:
+                m_torch.intensity = 6f;
+                m_torch.pointLightInnerAngle = 24;
+                m_torch.pointLightOuterAngle = 40;
+                break;
+        }
 
         //Handles player death if health reaches zero
         if (m_currentHealth == 0)
