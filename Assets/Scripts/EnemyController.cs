@@ -63,10 +63,12 @@ public class EnemyController : MonoBehaviour
         switch (m_enemyStates)
         {
             case EnemyStates.Idle:
-                // Just standing around...
+                m_agent.isStopped = true;//Stops movement immediately
+                m_agent.velocity = Vector3.zero;//Ensures no movement happens
                 break;
 
             case EnemyStates.MovingToPlayer:
+                m_agent.isStopped = false;
                 break;
 
             case EnemyStates.Attack:
@@ -99,8 +101,8 @@ public class EnemyController : MonoBehaviour
     public void Stun()
     {
         m_enemyStates = EnemyStates.Stunned;
-        m_agent.isStopped = true;//Stops movement immediately
-        m_agent.velocity = Vector3.zero;//Ensures no movement happens
+        m_agent.isStopped = true;
+        m_agent.velocity = Vector3.zero;
         StartCoroutine(StunTimer());//Delay for stunning
     }
 
