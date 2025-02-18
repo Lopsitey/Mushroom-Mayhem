@@ -1259,7 +1259,7 @@ GameObject:
   - component: {fileID: 1791582087}
   - component: {fileID: 1791582086}
   m_Layer: 5
-  m_Name: WinScore
+  m_Name: WinTime
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

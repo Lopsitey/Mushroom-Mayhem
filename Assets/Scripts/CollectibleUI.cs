@@ -17,7 +17,7 @@ public class CollectibleUI : MonoBehaviour
 
     private GameObject m_scoreLabel;
     private GameObject m_respawnScoreLabel;
-    private GameObject m_winScoreLabel;
+    private GameObject m_winTimeLabel;
 
     private static int m_currentScore = 0;//Static so it persists across scenes
 
@@ -25,7 +25,7 @@ public class CollectibleUI : MonoBehaviour
     {
         m_scoreLabel = GameObject.Find("ScoreLabel");
         m_respawnScoreLabel = GameObject.Find("RespawnScore");
-        m_winScoreLabel = GameObject.Find("WinScore");
+        m_winTimeLabel = GameObject.Find("WinTime");
         if (m_scoreLabel != null)
         {
             m_UILabel = m_scoreLabel.GetComponent<TMPro.TextMeshProUGUI>();
@@ -36,11 +36,11 @@ public class CollectibleUI : MonoBehaviour
             m_respawnUILabel.text = "Your final score: " + m_currentScore;
             m_currentScore = 0;//Resets on death
         }
-        if (m_winScoreLabel != null)
+        if (m_winTimeLabel != null)
         {
             double mins = Time.time > 60 ? Math.Truncate(Time.time / 60) : 0;
             double secs = Math.Truncate(Time.time - (mins * 60));//May be off by one on occasion
-            m_winUILabel = m_winScoreLabel.GetComponent<TMPro.TextMeshProUGUI>();
+            m_winUILabel = m_winTimeLabel.GetComponent<TMPro.TextMeshProUGUI>();
             m_winUILabel.text = $"Your final time: {mins}:{secs}";
         }
     }
